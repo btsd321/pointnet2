@@ -75,7 +75,7 @@ at::Tensor group_points(at::Tensor points, at::Tensor idx) {
                                 idx.data<int>(), output.data<float>());
   } else {
     // 仅支持CUDA实现, CPU暂不支持
-    AT_CHECK(false, "CPU not supported");
+    CHECK_MACRO(false, "CPU not supported");
   }
 
   // 返回分组后的特征
@@ -117,7 +117,7 @@ at::Tensor group_points_grad(at::Tensor grad_out, at::Tensor idx, const int n) {
         grad_out.data<float>(), idx.data<int>(), output.data<float>());
   } else {
     // 仅支持CUDA实现, CPU暂不支持
-    AT_CHECK(false, "CPU not supported");
+    CHECK_MACRO(false, "CPU not supported");
   }
 
   // 返回输入特征的梯度

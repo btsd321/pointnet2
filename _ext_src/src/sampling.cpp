@@ -50,7 +50,7 @@ at::Tensor gather_points(at::Tensor points, at::Tensor idx) {
                                  idx.data<int>(), output.data<float>());
   } else {
     // 仅支持CUDA实现, CPU暂不支持
-    AT_CHECK(false, "CPU not supported");
+    CHECK_MACRO(false, "CPU not supported");
   }
 
   // 返回采样后的特征
@@ -93,7 +93,7 @@ at::Tensor gather_points_grad(at::Tensor grad_out, at::Tensor idx,
                                       idx.data<int>(), output.data<float>());
   } else {
     // 仅支持CUDA实现, CPU暂不支持
-    AT_CHECK(false, "CPU not supported");
+    CHECK_MACRO(false, "CPU not supported");
   }
 
   // 返回输入特征的梯度
@@ -132,7 +132,7 @@ at::Tensor furthest_point_sampling(at::Tensor points, const int nsamples) {
         tmp.data<float>(), output.data<int>());
   } else {
     // 仅支持CUDA实现, CPU暂不支持
-    AT_CHECK(false, "CPU not supported");
+    CHECK_MACRO(false, "CPU not supported");
   }
 
   // 返回采样点索引

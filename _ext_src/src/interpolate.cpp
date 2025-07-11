@@ -55,7 +55,7 @@ std::vector<at::Tensor> three_nn(at::Tensor unknowns, at::Tensor knows) {
                             dist2.data<float>(), idx.data<int>());
   } else {
     // 仅支持CUDA实现, CPU暂不支持
-    AT_CHECK(false, "CPU not supported");
+    CHECK_MACRO(false, "CPU not supported");
   }
 
   // 返回距离和索引
@@ -102,7 +102,7 @@ at::Tensor three_interpolate(at::Tensor points, at::Tensor idx,
         output.data<float>());
   } else {
     // 仅支持CUDA实现, CPU暂不支持
-    AT_CHECK(false, "CPU not supported");
+    CHECK_MACRO(false, "CPU not supported");
   }
 
   // 返回插值后的特征
@@ -150,7 +150,7 @@ at::Tensor three_interpolate_grad(at::Tensor grad_out, at::Tensor idx,
         output.data<float>());
   } else {
     // 仅支持CUDA实现, CPU暂不支持
-    AT_CHECK(false, "CPU not supported");
+    CHECK_MACRO(false, "CPU not supported");
   }
 
   // 返回输入特征的梯度

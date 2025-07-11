@@ -7,6 +7,21 @@
 #include <ATen/cuda/CUDAContext.h>
 #include <torch/extension.h>
 
+#ifndef STR
+  #define STR(x) STR_HELPER(x)
+#endif
+#ifndef STR_HELPER
+  #define STR_HELPER(x) #x
+#endif
+
+#pragma message("TORCH_VERSION_MAJOR = " STR(TORCH_VERSION_MAJOR))
+
+#if defined(TORCH_VERSION_MAJOR) && TORCH_VERSION_MAJOR >= 1
+#define CHECK_MACRO TORCH_CHECK
+#else
+#define CHECK_MACRO AT_CHECK
+#endif
+
 /*
  * @brief 检查输入张量是否为CUDA张量的宏
  * 
@@ -17,7 +32,7 @@
  */
 #define CHECK_CUDA(x)                                          \
   do {                                                         \
-    AT_CHECK(x.type().is_cuda(), #x " must be a CUDA tensor"); \
+    CHECK_MACRO(x.type().is_cuda(), #x " must be a CUDA tensor"); \
   } while (0)
 
 /*
@@ -30,7 +45,7 @@
  */
 #define CHECK_CONTIGUOUS(x)                                         \
   do {                                                              \
-    AT_CHECK(x.is_contiguous(), #x " must be a contiguous tensor"); \
+    CHECK_MACRO(x.is_contiguous(), #x " must be a contiguous tensor"); \
   } while (0)
 
 /*
@@ -43,7 +58,7 @@
  */
 #define CHECK_IS_INT(x)                              \
   do {                                               \
-    AT_CHECK(x.scalar_type() == at::ScalarType::Int, \
+    CHECK_MACRO(x.scalar_type() == at::ScalarType::Int, \
              #x " must be an int tensor");           \
   } while (0)
 
@@ -57,6 +72,6 @@
  */
 #define CHECK_IS_FLOAT(x)                              \
   do {                                                 \
-    AT_CHECK(x.scalar_type() == at::ScalarType::Float, \
+    CHECK_MACRO(x.scalar_type() == at::ScalarType::Float, \
              #x " must be a float tensor");            \
   }

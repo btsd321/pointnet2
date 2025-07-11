@@ -61,7 +61,7 @@ at::Tensor ball_query(at::Tensor new_xyz, at::Tensor xyz, const float radius,
                                     xyz.data<float>(), idx.data<int>());
   } else {
     // 仅支持CUDA实现, CPU暂不支持
-    AT_CHECK(false, "CPU not supported");
+    CHECK_MACRO(false, "CPU not supported");
   }
 
   // 返回邻域点索引张量
