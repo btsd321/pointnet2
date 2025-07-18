@@ -45,7 +45,7 @@ at::Tensor ball_query(at::Tensor new_xyz, at::Tensor xyz, const float radius,
   CHECK_IS_FLOAT(xyz);
 
   // 如果new_xyz在CUDA上, 则xyz也必须在CUDA上
-  if (new_xyz.type().is_cuda()) {
+  if (IS_CUDA_TENSOR(new_xyz)) {
     CHECK_CUDA(xyz);
   }
 
@@ -55,13 +55,13 @@ at::Tensor ball_query(at::Tensor new_xyz, at::Tensor xyz, const float radius,
                    at::device(new_xyz.device()).dtype(at::ScalarType::Int));
 
   // 如果输入为CUDA张量, 调用CUDA核函数包装器
-  if (new_xyz.type().is_cuda()) {
+  if (IS_CUDA_TENSOR(new_xyz)) {
     query_ball_point_kernel_wrapper(xyz.size(0), xyz.size(1), new_xyz.size(1),
-                                    radius, nsample, new_xyz.data<float>(),
-                                    xyz.data<float>(), idx.data<int>());
+                                    radius, nsample, TENSOR_DATA_PTR(new_xyz, float),
+                                    TENSOR_DATA_PTR(xyz, float), TENSOR_DATA_PTR(idx, int));
   } else {
     // 仅支持CUDA实现, CPU暂不支持
-    CHECK_MACRO(false, "CPU not supported");
+    AT_CHECK(false, "CPU not supported");
   }
 
   // 返回邻域点索引张量

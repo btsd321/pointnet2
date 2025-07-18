@@ -34,7 +34,7 @@ at::Tensor gather_points(at::Tensor points, at::Tensor idx) {
   CHECK_IS_INT(idx);
 
   // 如果points在CUDA上, 则idx也必须在CUDA上
-  if (points.type().is_cuda()) {
+  if (IS_CUDA_TENSOR(points)) {
     CHECK_CUDA(idx);
   }
 
@@ -44,13 +44,13 @@ at::Tensor gather_points(at::Tensor points, at::Tensor idx) {
                    at::device(points.device()).dtype(at::ScalarType::Float));
 
   // 调用CUDA核函数进行特征采样
-  if (points.type().is_cuda()) {
+  if (IS_CUDA_TENSOR(points)) {
     gather_points_kernel_wrapper(points.size(0), points.size(1), points.size(2),
-                                 idx.size(1), points.data<float>(),
-                                 idx.data<int>(), output.data<float>());
+                                 idx.size(1), TENSOR_DATA_PTR(points, float),
+                                 TENSOR_DATA_PTR(idx, int), TENSOR_DATA_PTR(output, float));
   } else {
     // 仅支持CUDA实现, CPU暂不支持
-    CHECK_MACRO(false, "CPU not supported");
+    AT_CHECK(false, "CPU not supported");
   }
 
   // 返回采样后的特征
@@ -77,7 +77,7 @@ at::Tensor gather_points_grad(at::Tensor grad_out, at::Tensor idx,
   CHECK_IS_INT(idx);
 
   // 如果grad_out在CUDA上, 则idx也必须在CUDA上
-  if (grad_out.type().is_cuda()) {
+  if (IS_CUDA_TENSOR(grad_out)) {
     CHECK_CUDA(idx);
   }
 
@@ -87,13 +87,13 @@ at::Tensor gather_points_grad(at::Tensor grad_out, at::Tensor idx,
                    at::device(grad_out.device()).dtype(at::ScalarType::Float));
 
   // 调用CUDA核函数进行特征采样的反向传播
-  if (grad_out.type().is_cuda()) {
+  if (IS_CUDA_TENSOR(grad_out)) {
     gather_points_grad_kernel_wrapper(grad_out.size(0), grad_out.size(1), n,
-                                      idx.size(1), grad_out.data<float>(),
-                                      idx.data<int>(), output.data<float>());
+                                      idx.size(1), TENSOR_DATA_PTR(grad_out, float),
+                                      TENSOR_DATA_PTR(idx, int), TENSOR_DATA_PTR(output, float));
   } else {
     // 仅支持CUDA实现, CPU暂不支持
-    CHECK_MACRO(false, "CPU not supported");
+    AT_CHECK(false, "CPU not supported");
   }
 
   // 返回输入特征的梯度
@@ -126,13 +126,13 @@ at::Tensor furthest_point_sampling(at::Tensor points, const int nsamples) {
                   at::device(points.device()).dtype(at::ScalarType::Float));
 
   // 调用CUDA核函数进行最远点采样
-  if (points.type().is_cuda()) {
+  if (IS_CUDA_TENSOR(points)) {
     furthest_point_sampling_kernel_wrapper(
-        points.size(0), points.size(1), nsamples, points.data<float>(),
-        tmp.data<float>(), output.data<int>());
+        points.size(0), points.size(1), nsamples, TENSOR_DATA_PTR(points, float),
+        TENSOR_DATA_PTR(tmp, float), TENSOR_DATA_PTR(output, int));
   } else {
     // 仅支持CUDA实现, CPU暂不支持
-    CHECK_MACRO(false, "CPU not supported");
+    AT_CHECK(false, "CPU not supported");
   }
 
   // 返回采样点索引

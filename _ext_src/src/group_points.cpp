@@ -59,7 +59,7 @@ at::Tensor group_points(at::Tensor points, at::Tensor idx) {
   CHECK_IS_INT(idx);
 
   // 如果points在CUDA上, 则idx也必须在CUDA上
-  if (points.type().is_cuda()) {
+  if (IS_CUDA_TENSOR(points)) {
     CHECK_CUDA(idx);
   }
 
@@ -69,13 +69,13 @@ at::Tensor group_points(at::Tensor points, at::Tensor idx) {
                    at::device(points.device()).dtype(at::ScalarType::Float));
 
   // 如果输入为CUDA张量, 调用CUDA核函数包装器
-  if (points.type().is_cuda()) {
+  if (IS_CUDA_TENSOR(points)) {
     group_points_kernel_wrapper(points.size(0), points.size(1), points.size(2),
-                                idx.size(1), idx.size(2), points.data<float>(),
-                                idx.data<int>(), output.data<float>());
+                                idx.size(1), idx.size(2), TENSOR_DATA_PTR(points, float),
+                                TENSOR_DATA_PTR(idx, int), TENSOR_DATA_PTR(output, float));
   } else {
     // 仅支持CUDA实现, CPU暂不支持
-    CHECK_MACRO(false, "CPU not supported");
+    AT_CHECK(false, "CPU not supported");
   }
 
   // 返回分组后的特征
@@ -101,7 +101,7 @@ at::Tensor group_points_grad(at::Tensor grad_out, at::Tensor idx, const int n) {
   CHECK_IS_INT(idx);
 
   // 如果grad_out在CUDA上, 则idx也必须在CUDA上
-  if (grad_out.type().is_cuda()) {
+  if (IS_CUDA_TENSOR(grad_out)) {
     CHECK_CUDA(idx);
   }
 
@@ -111,13 +111,13 @@ at::Tensor group_points_grad(at::Tensor grad_out, at::Tensor idx, const int n) {
                    at::device(grad_out.device()).dtype(at::ScalarType::Float));
 
   // 如果输入为CUDA张量, 调用CUDA核函数包装器
-  if (grad_out.type().is_cuda()) {
+  if (IS_CUDA_TENSOR(grad_out)) {
     group_points_grad_kernel_wrapper(
         grad_out.size(0), grad_out.size(1), n, idx.size(1), idx.size(2),
-        grad_out.data<float>(), idx.data<int>(), output.data<float>());
+        TENSOR_DATA_PTR(grad_out, float), TENSOR_DATA_PTR(idx, int), TENSOR_DATA_PTR(output, float));
   } else {
     // 仅支持CUDA实现, CPU暂不支持
-    CHECK_MACRO(false, "CPU not supported");
+    AT_CHECK(false, "CPU not supported");
   }
 
   // 返回输入特征的梯度
